@@ -1,55 +1,59 @@
-import { useState,useEffect } from "react";
+import { useEffect, useState } from 'react'
+import Link from "next/link";
+import { useRouter } from "next/router";
 import Seo from "../components/Seo";
+import ItemList from '../src/component/ItemList';
+import { Divider, Header, Loader } from 'semantic-ui-react';
+
+export default function Home() {
+
+  const [list, setList] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  async function getData() {
+    const data = await (await fetch('http://makeup-api.herokuapp.com/api/v1/products.json?brand=maybelline')).json();
+    setList(data);
+    setIsLoading(false)
+  }
+
+  useEffect(() => {
+    getData();
+
+  }, []);
 
 
+  return (
+    <div>
+      {isLoading && (
+        <div style={{ padding: '300px 0' }}>
+          <Loader inline="centered" active>
+            Loading
+          </Loader>
 
-
-export default function Home(){
-    const [movies, setMovies] = useState([]);
-    useEffect(() => {
-        (async()=>{
-            const {results} = await 
-                (await fetch('/api/movies')).json();
-            
-            console.log(results)
-            setMovies(results)
-        })();
-        
-        return () => {
-            
-        };
-    }, []);
-    return (
-        <div className="container">
-           {/* <Seo title="home"/> */}
-           {!movies && <h4>Loading ...</h4>}
-            {movies?.map((movie)=>
-                <div className="movie" key={movie.id}>
-                <img src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`} />
-                <h4>{movie.original_title}</h4>
-              </div>
-            )}
-           <style jsx>{`
-        .container {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          padding: 20px;
-          gap: 20px;
-        }
-        .movie img {
-          max-width: 100%;
-          border-radius: 12px;
-          transition: transform 0.2s ease-in-out;
-          box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
-        }
-        .movie:hover img {
-          transform: scale(1.05) translateY(-10px);
-        }
-        .movie h4 {
-          font-size: 18px;
-          text-align: center;
-        }
-      `}</style> 
         </div>
-    )
+      )}
+      {!isLoading && (
+        <>
+          <Header as="h3" style={{ paddingTop: 30 }}>
+            베스트 상품
+          </Header>
+          <Divider />
+          <ItemList list={list.slice(0, 9)}></ItemList>
+          <Header as="h3" style={{ paddingTop: 30 }}>
+            신상품
+          </Header>
+          <Divider />
+          <ItemList list={list.slice(9)}></ItemList>
+        </>
+      )}
+
+    </div>
+  )
 }
+
+
+//create-next-app으로 설치하면
+//1. 컴파일과 번들링이 자동으로 된다(webpack 과 babel)
+//2. 자동 리프레쉬 기능으로 수정하면 화면에 바로 반영
+// 3. 서버사이드 렌더링 지원
+// 4. 스태틱 파일을 지원
