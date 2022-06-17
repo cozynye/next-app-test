@@ -9,9 +9,11 @@ export default function Home() {
 
   const [list, setList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  console.log(process.env.NEXT_PUBLIC_API_URL)
+  console.log('process.env.NEXT_PUBLIC_API_URL')
 
   async function getData() {
-    const data = await (await fetch('http://makeup-api.herokuapp.com/api/v1/products.json?brand=maybelline')).json();
+    const data = await (await fetch(process.env.NEXT_PUBLIC_API_URL)).json();
     setList(data);
     setIsLoading(false)
   }
@@ -20,6 +22,13 @@ export default function Home() {
     getData();
 
   }, []);
+
+  // 환경변수
+  // node js
+  // process.env.변수명
+
+  // browser
+  // process.env.NEXT_PUBLIC_변수명
 
 
   return (
